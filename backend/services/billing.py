@@ -12,8 +12,7 @@ CGT_RATE = float(os.getenv("CAPITAL_GAINS_TAX_RATE", 0.15))
 def generate_invoice_number() -> str:
     return f"TRD-{datetime.utcnow().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
 
-def bill_trade(trade: Trade, user_id: int, side: str,
-               cost_basis: float, db: Session) -> Invoice:
+def bill_trade(trade: Trade, user_id: int, side: str,cost_basis: float, db: Session) -> Invoice:
     """
     Generate invoice for one side of a trade.
     

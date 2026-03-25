@@ -20,7 +20,7 @@ class OrderRequest(BaseModel):
 @router.post("/")
 def submit_order(req: OrderRequest, db: Session = Depends(get_db)):
     """
-    Submit a new buy or sell order.
+    Submit a new buy or sell order
     Order is saved immediately, then matching runs asynchronously via Celery.
     """
     order = Order(
@@ -36,7 +36,7 @@ def submit_order(req: OrderRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(order)
 
-    # Kick off async matching — don't block the API response
+    # Kick off async matching. don't block the API response
     process_order_async.apply_async(args=[order.id], queue="orders")
 
     return {"order_id": order.id, "status": order.status, "message": "Order submitted"}

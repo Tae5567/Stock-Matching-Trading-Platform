@@ -15,12 +15,12 @@ r = redis.from_url(os.getenv("REDIS_URL"))
 @dataclass(order=True)
 class BookEntry:
     """
-    A single entry in the order book.
+    A single entry in the order book
     
     Sort key for BIDS (buys):  (-price, timestamp) → highest price first, then oldest first
     Sort key for ASKS (sells): (+price, timestamp) → lowest price first, then oldest first
     
-    This implements Price-Time Priority (standard exchange behavior).
+    This implements Price-Time Priority (standard exchange behavior)
     """
     sort_key: tuple = field(compare=True)
     order_id: int = field(compare=False)
@@ -31,8 +31,8 @@ class BookEntry:
 
 class OrderBook:
     """
-    In-memory order book for a single ticker.
-    Bids and asks are stored in Redis for persistence + speed.
+    In-memory order book for a single ticker
+    Bids and asks are stored in Redis for persistence + speed
     """
     def __init__(self, ticker: str):
         self.ticker = ticker
@@ -58,36 +58,36 @@ class OrderBook:
             self.asks.add(entry)
         self._persist()
 
+    # Highest buy price
     def best_bid(self) -> Optional[BookEntry]:
-        """Highest buy price."""
         return self.bids[0] if self.bids else None
 
+    # Lowest sell price
     def best_ask(self) -> Optional[BookEntry]:
-        """Lowest sell price."""
         return self.asks[0] if self.asks else None
 
+    # Difference between best ask and best bid
     def spread(self) -> Optional[float]:
-        """Difference between best ask and best bid."""
         if self.best_bid() and self.best_ask():
             return round(self.best_ask().price - self.best_bid().price, 4)
         return None
 
+    # Top N levels of the order book for display
     def depth_snapshot(self, levels: int = 10) -> dict:
-        """Top N levels of the order book for display."""
         return {
             "bids": [{"price": e.price, "qty": e.quantity} for e in list(self.bids)[:levels]],
             "asks": [{"price": e.price, "qty": e.quantity} for e in list(self.asks)[:levels]],
             "spread": self.spread()
         }
 
+    # Snapshot order to book Redis for other processes to read
     def _persist(self):
-        """Snapshot order book to Redis for other processes to read."""
         snapshot = self.depth_snapshot()
         r.setex(f"orderbook:{self.ticker}", 300, json.dumps(snapshot))
 
     @classmethod
+    # Restore from Redis (on startup / new worker)
     def load(cls, ticker: str) -> "OrderBook":
-        """Restore from Redis (on startup / new worker)."""
         book = cls(ticker)
         # In production: rebuild from open orders in Postgres
         return book

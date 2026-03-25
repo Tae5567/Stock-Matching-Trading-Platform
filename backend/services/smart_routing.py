@@ -27,7 +27,7 @@ def select_best_broker(ticker: str, side: str, quantity: int, urgency: bool) -> 
     - Urgency → prioritize low latency
     - Normal → prioritize low fee
     
-    In production: query each broker's live quotes, compare execution quality.
+    In production: query each broker's live quotes, compare execution quality
     """
     if urgency:
         # Fastest broker for urgent orders
@@ -36,11 +36,10 @@ def select_best_broker(ticker: str, side: str, quantity: int, urgency: bool) -> 
         # Cheapest broker for normal orders
         return min(BROKERS, key=lambda b: BROKERS[b]["fee_rate"])
 
-async def route_order(order_id: int, ticker: str, side: str,
-                      quantity: int, price: float, urgency: bool) -> Dict:
+async def route_order(order_id: int, ticker: str, side: str, quantity: int, price: float, urgency: bool) -> Dict:
     """
-    Send order to external broker (mock API call).
-    Returns execution confirmation or rejection.
+    Send order to external broker (mock API call)
+    Returns execution confirmation or rejection
     """
     broker_name = select_best_broker(ticker, side, quantity, urgency)
     broker = BROKERS[broker_name]

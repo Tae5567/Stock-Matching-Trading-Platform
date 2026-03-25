@@ -17,7 +17,7 @@ class MatchResult:
 
 def match_order(new_order: Order, db: Session) -> List[MatchResult]:
     """
-    Core matching function. Called whenever a new order arrives.
+    Core matching function. Called whenever a new order arrives
     
     How it works:
     1. Get the live order book for this ticker
@@ -26,7 +26,7 @@ def match_order(new_order: Order, db: Session) -> List[MatchResult]:
     4. If crossable: execute trade, reduce quantities, repeat until filled or no match
     5. Any remaining unfilled quantity goes into the book
     
-    This is Price-Time Priority matching (same as NYSE/NASDAQ).
+    This is Price-Time Priority matching (same as NYSE/NASDAQ)
     """
     book = get_book(new_order.ticker)
     trades = []
@@ -51,7 +51,7 @@ def match_order(new_order: Order, db: Session) -> List[MatchResult]:
             )
 
         if not can_execute:
-            break  # Price doesn't cross — add to book and wait
+            break  # Price doesn't cross. add to book and wait
 
         # Determine fill quantity (partial fills allowed)
         fill_qty = min(remaining_qty, opposite.quantity)
